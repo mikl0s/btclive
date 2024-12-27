@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatBitcoinAmount(amount: number): string {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 8,
-    maximumFractionDigits: 8
+    maximumFractionDigits: 8,
   }).format(amount)
 }
 

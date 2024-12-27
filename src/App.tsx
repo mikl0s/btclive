@@ -1,17 +1,22 @@
-import { useState } from "react"
-import { ThemeProvider } from "@/components/theme-provider"
-import { ModeToggle } from "./components/mode-toggle"
-import { Button } from "./components/ui/button"
-import { Input } from "./components/ui/input"
-import { TransactionDashboard } from "./components/transaction/TransactionDashboard"
-import { NotificationSettings, NotificationProvider } from "./components/notification/NotificationSettings"
-import { Toaster } from "./components/ui/toaster"
-import { motion, AnimatePresence } from "framer-motion"
-import { getLatestTransaction } from "./lib/api"
-import { useToast } from "./components/ui/use-toast"
+import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
+
+import { ThemeProvider } from '@/components/theme-provider'
+
+import { ModeToggle } from './components/mode-toggle'
+import {
+  NotificationProvider,
+  NotificationSettings,
+} from './components/notification/NotificationSettings'
+import { TransactionDashboard } from './components/transaction/TransactionDashboard'
+import { Button } from './components/ui/button'
+import { Input } from './components/ui/input'
+import { Toaster } from './components/ui/toaster'
+import { useToast } from './components/ui/use-toast'
+import { getLatestTransaction } from './lib/api'
 
 function App() {
-  const [txId, setTxId] = useState("")
+  const [txId, setTxId] = useState('')
   const [isTracking, setIsTracking] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -27,14 +32,14 @@ function App() {
       const latest = await getLatestTransaction()
       setTxId(latest.hash)
       toast({
-        title: "Latest Transaction Found",
-        description: "Latest unconfirmed transaction loaded successfully.",
+        title: 'Latest Transaction Found',
+        description: 'Latest unconfirmed transaction loaded successfully.',
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to fetch latest transaction. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: `Failed to fetch latest transaction: ${error instanceof Error ? error.message : 'Please try again.'}`,
+        variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
@@ -47,11 +52,7 @@ function App() {
         <div className="min-h-screen bg-background text-foreground">
           <header className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
-              <img
-                src="/bitcoin-icon.svg"
-                alt="BTC Live Logo"
-                className="h-8 w-8"
-              />
+              <img src="/bitcoin-icon.svg" alt="BTC Live Logo" className="h-8 w-8" />
               <h1 className="text-2xl font-bold">BTC Live</h1>
             </div>
             <div className="flex items-center gap-4">
@@ -80,12 +81,12 @@ function App() {
                       <Input
                         type="text"
                         value={txId}
-                        onChange={(e) => setTxId(e.target.value)}
+                        onChange={e => setTxId(e.target.value)}
                         placeholder="Enter transaction ID"
                         className="text-lg font-mono"
                         style={{ letterSpacing: '0.025em' }}
                       />
-                      <Button 
+                      <Button
                         onClick={handleTrack}
                         size="lg"
                         className="px-8 min-w-[120px]"
@@ -101,7 +102,7 @@ function App() {
                         disabled={isLoading}
                         className="w-full max-w-xs"
                       >
-                        {isLoading ? "Loading..." : "Get Latest Transaction"}
+                        {isLoading ? 'Loading...' : 'Get Latest Transaction'}
                       </Button>
                     </div>
                   </div>
@@ -115,10 +116,7 @@ function App() {
                 >
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Transaction Details</h2>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsTracking(false)}
-                    >
+                    <Button variant="outline" onClick={() => setIsTracking(false)}>
                       Track Another Transaction
                     </Button>
                   </div>
