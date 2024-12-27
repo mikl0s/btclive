@@ -20,18 +20,21 @@ Track Bitcoin transactions in real-time with a sleek, modern interface powered b
 ## ✨ Features
 
 ### 🔄 Real-time Transaction Tracking
+
 - Live status updates with confirmation count
 - Mempool monitoring and block confirmations
 - Visual progress indicators and animations
 - Automatic refresh every 30 seconds
 
 ### 🔔 Smart Notifications
+
 - Visual toast notifications for status changes
 - Audio alerts for important updates
 - Toggleable notification preferences
 - Notification history with timestamps
 
 ### 🎨 Modern UI & UX
+
 - Dark/Light mode with smooth transitions
 - Bitcoin orange accent colors
 - Responsive design for all devices
@@ -39,6 +42,7 @@ Track Bitcoin transactions in real-time with a sleek, modern interface powered b
 - Powered by shadcn/ui components
 
 ### 📊 Detailed Analytics
+
 - Transaction size and virtual size
 - Weight units and fee calculations
 - SegWit savings indicator
@@ -66,10 +70,12 @@ Visit `http://localhost:5173` and start tracking transactions!
 ### Transaction Tracking
 
 1. **Enter Transaction ID**
+
    - Paste a Bitcoin transaction ID, or
    - Click "Get Latest Transaction" for recent activity
 
 2. **Monitor Status**
+
    - Watch real-time confirmation progress
    - View detailed transaction information
    - Track fee rates and SegWit savings
@@ -86,6 +92,7 @@ The interface uses Bitcoin orange (#f7931a) as its primary accent color, providi
 ### Local Storage
 
 All settings and preferences are stored locally:
+
 - Notification preferences
 - Theme selection
 - Recent transactions
@@ -94,6 +101,7 @@ All settings and preferences are stored locally:
 ## 🔧 Development
 
 ### Prerequisites
+
 - Node.js 16+
 - pnpm package manager
 - Modern web browser
@@ -113,8 +121,14 @@ pnpm preview
 # Run tests
 pnpm test
 
+# Format code
+pnpm format
+
 # Lint code
 pnpm lint
+
+# Fix linting issues
+pnpm lint:fix
 
 # Record demo video
 pnpm record-demo
@@ -122,6 +136,18 @@ pnpm record-demo
 # Start dev server and record demo
 pnpm create-demo
 ```
+
+### Code Quality
+
+The project uses several tools to maintain code quality:
+
+- **Husky**: Manages Git hooks for pre-commit validation
+- **lint-staged**: Runs formatters and linters on staged files
+- **Prettier**: Ensures consistent code formatting
+- **ESLint**: Enforces code quality rules
+- **TypeScript**: Provides static type checking
+
+Pre-commit hooks automatically format and lint code before each commit.
 
 ### Project Structure
 
@@ -139,32 +165,44 @@ btclive/
 
 ## 🌐 API Integration
 
-### Transaction API
+### Type-Safe Transaction API
 
 ```typescript
-import { btcLiveAPI } from '@/lib/api'
+import { btcLiveAPI } from './src/lib/api'
 
-// Get latest transaction
+// Type-safe command handling
 const latest = await btcLiveAPI.handleCommand('getLatestTransaction')
 
-// Track specific transaction
+// Commands with parameters
 await btcLiveAPI.handleCommand('trackTransaction', {
-  txId: 'YOUR_TX_ID'
+  txId: 'YOUR_TX_ID',
 })
 
-// Listen for updates
-btcLiveAPI.addEventListener('transactionUpdate', (data) => {
+// Type-safe event listeners
+btcLiveAPI.addEventListener('transactionUpdate', data => {
+  // data is properly typed as TransactionData | LatestTransaction
   console.log('New update:', data)
+})
+
+btcLiveAPI.addEventListener('statusUpdate', data => {
+  // data is properly typed with transaction, confirmations, and block
+  console.log('Status:', data)
 })
 ```
 
-### WebSocket Events
+### Type-Safe Events
 
-| Event | Description | Payload |
-|-------|-------------|---------|
-| `transactionUpdate` | New transaction data | `TransactionData` |
-| `statusUpdate` | Confirmation status | `StatusUpdate` |
-| `notificationUpdate` | Notification state | `NotificationState` |
+| Event                         | Description          | Type-safe Payload                                                        |
+| ----------------------------- | -------------------- | ------------------------------------------------------------------------ |
+| `transactionUpdate`           | New transaction data | `TransactionData \| LatestTransaction`                                   |
+| `statusUpdate`                | Confirmation status  | `{ transaction: TransactionData; confirmations: number; block: number }` |
+| `notificationSettingsChanged` | Settings update      | `NotificationSettings`                                                   |
+
+The event system provides:
+
+- Compile-time type checking for event names
+- Proper typing of event data
+- IntelliSense support in modern IDEs
 
 ## 🤝 Contributing
 
