@@ -40,16 +40,17 @@ export function formatTime(
     hour12: false,
     includeSeconds: true,
     includeDate: true,
-    includeTimezone: true
+    includeTimezone: true,
   }
 ): string {
   const date = new Date(timestamp * 1000)
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const now = new Date()
   const isToday = date.toDateString() === now.toDateString()
-  const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString()
+  const isYesterday =
+    new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString()
 
-  let parts: string[] = []
+  const parts: string[] = []
 
   // Format the time part first
   const timePart = new Intl.DateTimeFormat('en-US', {
@@ -57,7 +58,7 @@ export function formatTime(
     minute: '2-digit',
     second: options.includeSeconds ? '2-digit' : undefined,
     hour12: false,
-    timeZone
+    timeZone,
   }).format(date)
 
   // Date part
@@ -70,7 +71,7 @@ export function formatTime(
       const datePart = new Intl.DateTimeFormat('en-US', {
         day: 'numeric',
         month: 'short',
-        year: 'numeric'
+        year: 'numeric',
       }).format(date)
       parts.push(datePart)
     }
@@ -99,8 +100,8 @@ export async function getTransactionDetails(txId: string): Promise<TransactionDa
     method: 'GET',
     mode: 'cors',
     headers: {
-      'Accept': 'application/json'
-    }
+      Accept: 'application/json',
+    },
   })
   if (!response.ok) {
     throw new Error('Failed to fetch transaction data')
@@ -119,7 +120,7 @@ const rateLimiter = {
       await new Promise(resolve => setTimeout(resolve, this.minInterval - timeSinceLastCall))
     }
     this.lastCall = Date.now()
-  }
+  },
 }
 
 export async function getLatestBlock(): Promise<number> {
@@ -129,8 +130,8 @@ export async function getLatestBlock(): Promise<number> {
       method: 'GET',
       mode: 'cors',
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     })
     if (!response.ok) {
       if (response.status === 429) {
@@ -153,8 +154,8 @@ export async function getLatestTransaction(): Promise<LatestTransaction> {
     method: 'GET',
     mode: 'cors',
     headers: {
-      'Accept': 'application/json'
-    }
+      Accept: 'application/json',
+    },
   })
   if (!response.ok) {
     throw new Error('Failed to fetch latest transactions')
@@ -164,7 +165,7 @@ export async function getLatestTransaction(): Promise<LatestTransaction> {
   return {
     hash: latest.hash,
     time: latest.time,
-    block_height: latest.block_height
+    block_height: latest.block_height,
   }
 }
 
@@ -187,9 +188,7 @@ export function calculateTotalInput(tx: TransactionData): number {
 }
 
 export function calculateTotalOutput(tx: TransactionData): number {
-  return formatBitcoinAmount(
-    tx.out.reduce((sum, output) => sum + (output.value || 0), 0)
-  )
+  return formatBitcoinAmount(tx.out.reduce((sum, output) => sum + (output.value || 0), 0))
 }
 
 export function calculateFee(tx: TransactionData): number {
@@ -221,20 +220,37 @@ export interface NotificationSettings {
   audio: boolean
 }
 
-export interface APIResponse {
+export type APIEventData = {
+  transactionUpdate: TransactionData | LatestTransaction
+  statusUpdate: {
+    transaction: TransactionData
+    confirmations: number
+    block: number
+  }
+  notificationSettingsChanged: NotificationSettings
+}
+
+export type APIEventType = keyof APIEventData
+
+export interface APIResponse<T = unknown> {
   success: boolean
-  data?: any
+  data?: T
   error?: string
 }
 
 export class BTCLiveAPI {
   private static instance: BTCLiveAPI
-  private eventListeners: Map<string, ((data: any) => void)[]>
+  private eventListeners: {
+    [K in APIEventType]: Set<(data: APIEventData[K]) => void>
+  } = {
+    transactionUpdate: new Set(),
+    statusUpdate: new Set(),
+    notificationSettingsChanged: new Set(),
+  }
   private notificationSettings: NotificationSettings
 
   private constructor() {
-    this.eventListeners = new Map()
-    const stored = localStorage.getItem("notification-settings")
+    const stored = localStorage.getItem('notification-settings')
     this.notificationSettings = stored ? JSON.parse(stored) : { visual: true, audio: false }
   }
 
@@ -245,28 +261,22 @@ export class BTCLiveAPI {
     return BTCLiveAPI.instance
   }
 
-  addEventListener(event: string, callback: (data: any) => void) {
-    if (!this.eventListeners.has(event)) {
-      this.eventListeners.set(event, [])
-    }
-    this.eventListeners.get(event)?.push(callback)
+  addEventListener<T extends APIEventType>(
+    event: T,
+    callback: (data: APIEventData[T]) => void
+  ): void {
+    this.eventListeners[event].add(callback)
   }
 
-  removeEventListener(event: string, callback: (data: any) => void) {
-    const listeners = this.eventListeners.get(event)
-    if (listeners) {
-      const index = listeners.indexOf(callback)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    }
+  removeEventListener<T extends APIEventType>(
+    event: T,
+    callback: (data: APIEventData[T]) => void
+  ): void {
+    this.eventListeners[event].delete(callback)
   }
 
-  private emit(event: string, data: any) {
-    const listeners = this.eventListeners.get(event)
-    if (listeners) {
-      listeners.forEach(callback => callback(data))
-    }
+  private emit<T extends APIEventType>(event: T, data: APIEventData[T]): void {
+    this.eventListeners[event].forEach(callback => callback(data))
   }
 
   // Notification Control Methods
@@ -300,58 +310,69 @@ export class BTCLiveAPI {
 
   private updateNotificationSettings(settings: Partial<NotificationSettings>): void {
     this.notificationSettings = { ...this.notificationSettings, ...settings }
-    localStorage.setItem("notification-settings", JSON.stringify(this.notificationSettings))
+    localStorage.setItem('notification-settings', JSON.stringify(this.notificationSettings))
     this.emit('notificationSettingsChanged', this.notificationSettings)
   }
 
-  async handleCommand(command: string, params: any = {}): Promise<APIResponse> {
-    try {
-      switch (command) {
-        case 'getLatestTransaction':
-          const tx = await getLatestTransaction()
-          this.emit('transactionUpdate', tx)
-          return { success: true, data: tx }
+  private commands = {
+    getLatestTransaction: async () => {
+      const tx = await getLatestTransaction()
+      this.emit('transactionUpdate', tx)
+      return { success: true, data: tx }
+    },
 
-        case 'trackTransaction':
-          if (!params.txId) {
-            return { success: false, error: 'Transaction ID required' }
-          }
-          const txData = await getTransactionDetails(params.txId)
-          this.emit('transactionUpdate', txData)
-          return { success: true, data: txData }
-
-        case 'getStatus':
-          const [transaction, block] = await Promise.all([
-            getTransactionDetails(params.txId),
-            getLatestBlock()
-          ])
-          const confirmations = calculateConfirmations(transaction.block_height, block)
-          const status = {
-            transaction,
-            confirmations,
-            block
-          }
-          this.emit('statusUpdate', status)
-          return { success: true, data: status }
-
-        case 'toggleVisual':
-          this.toggleVisual()
-          return { success: true, data: this.notificationSettings }
-
-        case 'toggleAudio':
-          this.toggleAudio()
-          return { success: true, data: this.notificationSettings }
-
-        case 'getNotificationSettings':
-          return { success: true, data: this.getNotificationSettings() }
-
-        default:
-          return { success: false, error: 'Unknown command' }
+    trackTransaction: async (params: { txId: string }) => {
+      if (!params.txId) {
+        return { success: false, error: 'Transaction ID required' }
       }
+      const txData = await getTransactionDetails(params.txId)
+      this.emit('transactionUpdate', txData)
+      return { success: true, data: txData }
+    },
+
+    getStatus: async (params: { txId: string }) => {
+      const [transaction, block] = await Promise.all([
+        getTransactionDetails(params.txId),
+        getLatestBlock(),
+      ])
+      const confirmations = calculateConfirmations(transaction.block_height, block)
+      const status = {
+        transaction,
+        confirmations,
+        block,
+      }
+      this.emit('statusUpdate', status)
+      return { success: true, data: status }
+    },
+
+    toggleVisual: async () => {
+      this.toggleVisual()
+      return { success: true, data: this.notificationSettings }
+    },
+
+    toggleAudio: async () => {
+      this.toggleAudio()
+      return { success: true, data: this.notificationSettings }
+    },
+
+    getNotificationSettings: async () => {
+      return { success: true, data: this.getNotificationSettings() }
+    },
+  } as const
+
+  async handleCommand<T extends keyof typeof this.commands>(
+    command: T,
+    params?: Parameters<(typeof this.commands)[T]>[0]
+  ): Promise<APIResponse> {
+    try {
+      if (command in this.commands) {
+        return await this.commands[command](params as never)
+      }
+      return { success: false, error: 'Unknown command' }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
