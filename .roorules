@@ -1,0 +1,339 @@
+# BTC Live
+
+**Project Name:** BTC Live  
+**License:** MIT
+
+## Summary
+
+I want you to create a web application called **BTC Live** that allows me to enter a Bitcoin transaction ID and see its live status updates. The project must have a **cool and sleek interface** and rely on **browser local storage** only (no external databases or servers).
+
+When the user enters a transaction ID, the app should track its status in real time (e.g., confirmations, mempool vs. mined, etc.). I also want both **audible** and **visible** (on-screen) notifications whenever the status changes, and the user should be able to toggle these notifications (on/off) via slide toggles.
+
+We’ll use **shadcn** as the UI library, but **if your shadcn documentation is older than November 2024, please ask for updated documentation** before proceeding.
+
+---
+
+## Key Features & Requirements
+
+1. **Local Storage Backend Only**  
+   - All data persistence must be handled using browser local storage—no external database or server.
+
+2. **Transaction Tracking**  
+   - Input field to enter a valid Bitcoin transaction ID.  
+   - Live status tracking for the transaction (number of confirmations, pending, mempool, confirmed, etc.).  
+   - Use a public Bitcoin API or WebSockets (if available) to fetch the latest status.  
+   - Data must be stored in local storage, not an external DB.
+
+3. **Notifications**  
+   - **Audible Notification**: Play a short sound when the status changes.  
+   - **Visible Notification**: Display an on-screen toast or alert message.  
+   - Each notification type can be toggled on/off with a slide toggle (shadcn switch).
+
+4. **Shadcn UI**  
+   - Use **shadcn** components for styling and UI elements.  
+   - If your documentation for shadcn is older than November 2024, ask for an update.
+
+5. **Dark/Light Mode**  
+   - **Dark mode** by default.  
+   - A **slide toggle** to switch between dark and light modes.
+
+6. **User-Selectable Accent Color**  
+   - A **small modal** containing a **touch-friendly color selector** so users can choose an accent color.  
+   - The chosen accent color should be applied across all accent-capable UI elements.
+
+7. **Branding & Visual Identity**  
+   - The project is called **BTC Live**.  
+   - Include an **awesome hero section** on the landing page with bold title, tagline, and **cool static and live badges**.
+
+8. **README.md**  
+   - A **hero section** describing BTC Live.  
+   - Clear installation and usage instructions, including how to run the project locally (front-end only).  
+   - **Cool static and live badges** (e.g., license, version, build status, etc.).  
+   - Steps on selecting an accent color, toggling notifications, and switching themes.  
+   - Any disclaimers about third-party APIs for transaction status.
+
+9. **Open-Source License**  
+   - Include the **MIT License** in a separate `LICENSE` file and mention it in `README.md`.
+
+---
+
+## Technical Expectations
+
+- **Framework**: React or a similar React-based solution is preferred.  
+- **Shadcn**: Must integrate the shadcn component library for design consistency.  
+- **API Integration**: Use a reputable Bitcoin API for real-time transaction status.  
+- **Storage**: All user settings (notifications toggles, theme mode, accent color) and transaction data must be stored in **local storage**.
+
+---
+
+## Final Deliverables
+
+1. **Complete Front-End Codebase**  
+   - A single-page or multi-page React app that meets all requirements.
+
+2. **README.md**  
+   - Overview (hero section) of BTC Live.  
+   - Installation and usage instructions.  
+   - Cool badges.  
+   - Explanation of all key features (theme toggle, accent color picker, notifications toggles).  
+   - Mention the MIT License.
+
+3. **MIT License File**  
+   - A `LICENSE` file containing the MIT license text.
+
+---
+
+**If you have any questions, especially about the shadcn documentation (if you don’t have a version from November 2024 or newer), please let me know. I’m looking forward to seeing the final product!**
+
+## Project structure - 
+
+btc-live
+├── LICENSE
+├── README.md
+├── package.json
+├── src
+│   ├── App.tsx
+│   ├── index.tsx
+│   ├── components
+│   │   ├── NotificationToggle.tsx
+│   │   ├── ThemeToggle.tsx
+│   │   ├── AccentColorPicker.tsx
+│   │   ├── TransactionStatus.tsx
+│   │   └── ...
+│   ├── pages
+│   │   └── Home.tsx (or Home.tsx)
+│   ├── utils
+│   │   ├── api.js
+│   │   └── localStorage.js
+│   ├── styles
+│   │   └── global.css
+│   ├── static
+│   │   ├── favicon.png
+│   │   ├── btc-logo.png
+│   │   └── logo.png
+│   └── ...
+└── ...
+
+# Node & Project Setup Instructions
+
+Below are step-by-step instructions on how to set up your Node environment, manage dependencies with pnpm, configure import sorting, formatting, linting, and unit testing, and use Vite for development and production builds.
+
+---
+
+## 1. Node.js
+
+- **Required Node.js Version**: Ensure you have **Node.js v16** or higher installed.  
+- You can verify your Node version by running:
+    node -v
+- If you need to install or update Node, visit [nodejs.org](https://nodejs.org) or use a version manager like [nvm](https://github.com/nvm-sh/nvm).
+
+---
+
+## 2. Using pnpm
+
+We’ll use **pnpm** for package management. If you don’t have pnpm installed, run:
+    npm install -g pnpm
+
+### 2.1 Installing Dependencies
+Once pnpm is installed, run:
+    pnpm install
+This will install all project dependencies listed in `package.json`.
+
+### 2.2 General Usage vs. Development
+- **General Usage** (start the app in production mode or a built environment):
+      pnpm run build
+      pnpm run preview
+
+  > `pnpm run preview` is typically used for previewing your production build locally.
+
+- **Development Mode** (hot-reload dev server):
+      pnpm run dev
+
+  > This launches a local dev server (usually on http://localhost:5173 by default for Vite).
+
+---
+
+## 3. Vite Setup
+
+We use **Vite** for a fast development workflow and build system. Here are the common Vite commands:
+
+- **Start Development Server**:  
+      pnpm run dev
+
+  This runs Vite’s dev server with hot module replacement.
+
+- **Production Build**:  
+      pnpm run build
+
+  This compiles and bundles your code for production.
+
+- **Preview Production Build**:  
+      pnpm run preview
+
+  This serves your built application locally to verify everything is working before deploying.
+
+---
+
+## 4. ESLint & Import Sorting
+
+### 4.1 ESLint Configuration
+We use [ESLint](https://eslint.org/) to maintain code quality and consistency.  
+- **Basic Setup**: You’ll have an `.eslintrc` or `.eslintrc.js` file in the project root with recommended or specific rules.
+
+### 4.2 Import Sorting
+To automatically sort your imports, we recommend using **eslint-plugin-simple-import-sort** or **eslint-plugin-import**. For example, you might have rules like:
+{
+  "plugins": ["simple-import-sort"],
+  "rules": {
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error"
+  }
+}
+This way, every time ESLint is run or when you auto-fix issues, your imports will be sorted automatically.
+
+### 4.3 Running ESLint
+You can run ESLint manually:
+    pnpm run lint
+> Typically, this command will be defined in your `package.json` scripts, for example:
+> "lint": "eslint --ext .js,.jsx,.ts,.tsx src/"
+
+---
+
+## 5. Formatting with Prettier
+
+We use [Prettier](https://prettier.io/) for code formatting.  
+- **Prettier Config**: There should be a `.prettierrc` or `prettier.config.js` file in the project root with desired formatting rules.  
+- **Integration with ESLint**: Ensure `eslint-config-prettier` is installed to avoid rule conflicts.  
+- **Format Command**:
+    pnpm run format
+
+For instance, you might have:  
+"format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md}'"  
+in your `package.json` scripts.
+
+---
+
+## 6. Unit Testing
+
+You can choose **Jest** or **Vitest**. Since we’re using Vite, **Vitest** is often simpler to configure.
+
+### 6.1 Vitest Setup
+- Install Vitest (if not already installed):
+      pnpm add -D vitest
+- Configure `vitest.config.ts` or `vite.config.js` to enable testing. A basic example in `vite.config.js`:
+    // vite.config.js
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+
+    export default defineConfig({
+      plugins: [react()],
+      test: {
+        globals: true,
+        environment: 'jsdom'
+      }
+    })
+
+- **Running Tests**:
+      pnpm run test
+
+> You might have "test": "vitest" or something similar in your `package.json` scripts.
+
+---
+
+## 7. Summary of Scripts (Example)
+
+Below is an example `scripts` section in `package.json`. Adjust as needed:
+
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src/",
+    "format": "prettier --write .",
+    "test": "vitest"
+  }
+}
+
+- **pnpm run dev**: Launches the dev server with hot module reloading.
+- **pnpm run build**: Builds the project for production (bundled output).
+- **pnpm run preview**: Serves the production build locally for final checks.
+- **pnpm run lint**: Runs ESLint to detect and fix linting issues.
+- **pnpm run format**: Formats code with Prettier.
+- **pnpm run test**: Executes unit tests with Vitest (or Jest, if chosen).
+
+---
+
+## 8. Environment Variables (Optional)
+
+If you have environment-specific variables (e.g., API keys), you can create a `.env` file at the project root. For Vite, they typically start with `VITE_`, for example:
+
+VITE_BITCOIN_API_URL="https://api.blockchain.com/..."
+
+Then in your code:
+
+    const apiUrl = import.meta.env.VITE_BITCOIN_API_URL
+
+---
+
+You’re now ready to work on your full-stack (or rather, front-end + local storage) BTC Live project with a clean, consistent development environment!
+
+
+## shadcn
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 50.4%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
