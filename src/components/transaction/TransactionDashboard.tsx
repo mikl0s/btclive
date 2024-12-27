@@ -1,25 +1,26 @@
-import { useState, useEffect, useContext, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Circle, CheckCircle, Clock, ArrowRight, Database, Coins, Info } from "lucide-react"
-import { CountdownTimer } from "../ui/countdown-timer"
-import { Progress } from "../ui/progress"
-import { Badge } from "../ui/badge"
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card"
-import { NotificationContext, NotificationHistory } from "../notification/NotificationSettings"
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowRight, CheckCircle, Circle, Clock, Coins, Database, Info } from 'lucide-react'
+import { useCallback, useContext, useEffect, useState } from 'react'
+
 import {
-  getTransactionDetails,
-  getLatestBlock,
   calculateConfirmations,
+  calculateFee,
+  calculateSegwitSavings,
   calculateTotalInput,
   calculateTotalOutput,
-  calculateFee,
-  formatTime,
-  calculateSegwitSavings,
-  calculateWeightUnits,
   calculateVirtualSize,
+  calculateWeightUnits,
+  formatTime,
   getFeeRate,
+  getLatestBlock,
+  getTransactionDetails,
   type TransactionData,
-} from "../../lib/api"
+} from '../../lib/api'
+import { NotificationContext, NotificationHistory } from '../notification/NotificationSettings'
+import { Badge } from '../ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { CountdownTimer } from '../ui/countdown-timer'
+import { Progress } from '../ui/progress'
 
 interface TransactionDashboardProps {
   txId: string
@@ -46,7 +47,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
     confirmations: 0,
     status: 'mempool',
     error: null,
-    latestBlock: 0
+    latestBlock: 0,
   })
 
   const { playNotification } = useContext(NotificationContext)
@@ -57,47 +58,41 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
         return {
           variant: 'success',
           label: 'Confirmed',
-          description: 'Transaction confirmed in blockchain (6+ confirmations)'
+          description: 'Transaction confirmed in blockchain (6+ confirmations)',
         }
       case 'pending':
         return {
           variant: 'warning',
           label: 'Pending',
-          description: 'Transaction included in a block, awaiting more confirmations'
+          description: 'Transaction included in a block, awaiting more confirmations',
         }
       case 'mempool':
         return {
           variant: 'info',
           label: 'In Mempool',
-          description: 'Transaction is in the memory pool, waiting to be included in a block'
+          description: 'Transaction is in the memory pool, waiting to be included in a block',
         }
       default:
         return {
           variant: 'default',
           label: 'Unknown',
-          description: 'Unknown transaction status'
+          description: 'Unknown transaction status',
         }
     }
   }
 
   const fetchAndUpdateData = useCallback(async () => {
     try {
-      const [tx, latestBlock] = await Promise.all([
-        getTransactionDetails(txId),
-        getLatestBlock()
-      ])
+      const [tx, latestBlock] = await Promise.all([getTransactionDetails(txId), getLatestBlock()])
 
       const confirmations = calculateConfirmations(tx.block_height, latestBlock)
-      const newStatus = confirmations >= 6 ? 'confirmed' 
-                     : confirmations > 0 ? 'pending' 
-                     : 'mempool'
+      const newStatus = confirmations >= 6 ? 'confirmed' : confirmations > 0 ? 'pending' : 'mempool'
 
       setStatus(prev => {
         const isInitialLoad = !prev.lastRefresh
         const statusChanged = !isInitialLoad && prev.status !== newStatus
-        const confirmationsChanged = !isInitialLoad && 
-          prev.confirmations !== confirmations && 
-          confirmations > 0
+        const confirmationsChanged =
+          !isInitialLoad && prev.confirmations !== confirmations && confirmations > 0
 
         // Only notify for actual changes, not initial load
         if (!isInitialLoad && (statusChanged || confirmationsChanged)) {
@@ -114,14 +109,14 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
           status: newStatus,
           error: null,
           latestBlock,
-          lastRefresh: new Date()
+          lastRefresh: new Date(),
         }
       })
     } catch (error) {
       console.error('Fetch error:', error)
       setStatus(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to fetch transaction data'
+        error: error instanceof Error ? error.message : 'Failed to fetch transaction data',
       }))
     }
   }, [txId, playNotification])
@@ -166,9 +161,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                   <CardTitle className="mb-2">Transaction ID</CardTitle>
                   <code className="text-sm bg-muted p-2 rounded">{txId}</code>
                 </div>
-                <Badge variant={statusInfo.variant}>
-                  {statusInfo.label}
-                </Badge>
+                <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
               </CardHeader>
             </Card>
           </motion.div>
@@ -201,7 +194,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                         ) : i === status.confirmations ? (
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                           >
                             <Clock className="w-8 h-8 text-yellow-500" />
                           </motion.div>
@@ -209,9 +202,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                           <Circle className="w-8 h-8 text-muted-foreground" />
                         )}
                       </div>
-                      <span className="text-sm text-muted-foreground mt-2">
-                        Block {i + 1}
-                      </span>
+                      <span className="text-sm text-muted-foreground mt-2">Block {i + 1}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -236,9 +227,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                     <Badge variant={statusInfo.variant} className="mb-1">
                       {statusInfo.label}
                     </Badge>
-                    <p className="text-sm text-muted-foreground">
-                      {statusInfo.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{statusInfo.description}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -253,30 +242,28 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Version</span>
-                  <span className="font-medium">
-                    {status.data ? status.data.version : '-'}
-                  </span>
+                  <span className="font-medium">{status.data ? status.data.version : '-'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Lock Time</span>
-                  <span className="font-medium">
-                    {status.data ? status.data.lock_time : '-'}
-                  </span>
+                  <span className="font-medium">{status.data ? status.data.lock_time : '-'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Last Refresh</span>
                   <span className="font-medium">
-                    {status.lastRefresh ? formatTime(Math.floor(status.lastRefresh.getTime() / 1000), {
-                      includeDate: false,
-                      includeTimezone: true,
-                      includeSeconds: true
-                    }) : '-'}
+                    {status.lastRefresh
+                      ? formatTime(Math.floor(status.lastRefresh.getTime() / 1000), {
+                          includeDate: false,
+                          includeTimezone: true,
+                          includeSeconds: true,
+                        })
+                      : '-'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Next Update</span>
-                  <CountdownTimer 
-                    interval={30000} 
+                  <CountdownTimer
+                    interval={30000}
                     onComplete={fetchAndUpdateData}
                     className="w-32"
                   />
@@ -322,9 +309,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Fee Rate</span>
-                  <span className="font-medium">
-                    {status.data ? getFeeRate(status.data) : '-'}
-                  </span>
+                  <span className="font-medium">{status.data ? getFeeRate(status.data) : '-'}</span>
                 </div>
                 {status.data && calculateSegwitSavings(status.data) && (
                   <div className="flex items-center justify-between text-green-500">
@@ -332,9 +317,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                       <Info className="h-4 w-4" />
                       SegWit Savings
                     </span>
-                    <span className="font-medium">
-                      {calculateSegwitSavings(status.data)}%
-                    </span>
+                    <span className="font-medium">{calculateSegwitSavings(status.data)}%</span>
                   </div>
                 )}
               </CardContent>
@@ -357,7 +340,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                   <motion.div
                     className="flex-1 bg-muted p-4 rounded-lg text-center"
                     whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
                     <Database className="w-6 h-6 mx-auto mb-2" />
                     <div className="font-medium">
@@ -369,7 +352,7 @@ export function TransactionDashboard({ txId }: TransactionDashboardProps) {
                   <motion.div
                     className="flex-1 bg-muted p-4 rounded-lg text-center"
                     whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
                     <Coins className="w-6 h-6 mx-auto mb-2" />
                     <div className="font-medium">

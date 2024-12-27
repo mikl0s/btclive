@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react"
-import { cn } from "../../lib/utils"
-import { Progress } from "../../components/ui/progress"
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { Progress } from '../../components/ui/progress'
+import { cn } from '../../lib/utils'
 
 interface CountdownTimerProps {
   interval: number // in milliseconds
@@ -65,11 +66,9 @@ export function CountdownTimer({ interval, onComplete, className }: CountdownTim
   const progress = (timeLeft / interval) * 100
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       <Progress value={progress} className="w-24" />
-      <span className="text-sm text-muted-foreground">
-        {Math.ceil(timeLeft / 1000)}s
-      </span>
+      <span className="text-sm text-muted-foreground">{Math.ceil(timeLeft / 1000)}s</span>
     </div>
   )
 }
