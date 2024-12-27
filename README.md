@@ -1,6 +1,6 @@
 <div align="center">
 
-# BTC Live 🚀
+# BTC Live Transaction Tracker
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/mikkelgeorgsen/btclive)
