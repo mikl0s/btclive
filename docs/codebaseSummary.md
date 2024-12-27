@@ -28,6 +28,7 @@
 
 - **Icons**: bitcoin-icon.png, bitcoin-icon.svg
 - **Logo**: bitcoin-logo.svg
+- **Demo**: demo.gif
 
 ## Recent Significant Changes
 
