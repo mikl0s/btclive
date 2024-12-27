@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "record-demo": "tsx scripts/record-demo.ts",
     "create-demo": "BROWSER=none pnpm dev & sleep 5 && xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' pnpm record-demo",
-    "prepare": "husky"
+    "prepare": "husky && husky install"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -53,7 +53,7 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^15.14.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.0",
     "lint-staged": "^15.2.11",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
